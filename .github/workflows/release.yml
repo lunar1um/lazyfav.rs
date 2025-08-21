@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+        include:
+          - target: x86_64-pc-windows-gnu
+            ext: .exe
+          - target: x86_64-unknown-linux-gnu
+            ext: ""
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add ${{ matrix.target }}
+
+      - name: Install Windows toolchain
+        if: matrix.target == 'x86_64-pc-windows-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64
+
+      - name: Install libxdo
+        run: sudo apt-get update && sudo apt-get install -y libxdo-dev
+
+      - name: Build binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          BIN_NAME=lazyfav${{ matrix.ext }}
+          cp target/${{ matrix.target }}/release/$BIN_NAME dist/lazyfav-${{ matrix.target }}${{ matrix.ext }}
+          cd dist && zip lazyfav-${{ matrix.target }}.zip lazyfav-${{ matrix.target }}${{ matrix.ext }}
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
