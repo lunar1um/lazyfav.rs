@@ -2,7 +2,8 @@
 <sub>an amazing tool to quickly add the currently playing spotify track into your favourite list!! (without having to open spotify :shock:)</sub>  
 
 ### why..?
-because it's cool, we all love automation right?
+because it's cool, we all love automation right?  
+and uhh, the binary size is smaller than v1 (which is a great news)
 
 ### install
 #### spotify api credentials
@@ -27,3 +28,6 @@ just go to **Releases** buddy
 
 #### okay now run
 it will authorize on first time, after that everything is automated :3
+
+#### also
+i use this in my [dotfiles](https://github.com/lunar1um/dotfiles)  
